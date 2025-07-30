@@ -1,0 +1,97 @@
+{
+  "tests": [
+    {
+      "name": "Valid Weather Query - London",
+      "method": "GET",
+      "url": "/weather?city=London",
+      "expected": {
+        "status_code": 200,
+        "response_keys": ["city", "temperature", "description"],
+        "response_values": {
+          "city": "London"
+        }
+      }
+    },
+    {
+      "name": "Valid Weather Query - New York",
+      "method": "GET", 
+      "url": "/weather?city=New York",
+      "expected": {
+        "status_code": 200,
+        "response_keys": ["city", "temperature", "description"]
+      }
+    },
+    {
+      "name": "Valid Weather Query - Tokyo",
+      "method": "GET",
+      "url": "/weather?city=Tokyo", 
+      "expected": {
+        "status_code": 200,
+        "response_keys": ["city", "temperature", "description"],
+        "response_values": {
+          "city": "Tokyo"
+        }
+      }
+    },
+    {
+      "name": "API Endpoint Alternative 1",
+      "method": "GET",
+      "url": "/api/weather/Paris",
+      "expected": {
+        "status_code": 200,
+        "response_keys": ["city", "temperature", "description"]
+      }
+    },
+    {
+      "name": "API Endpoint Alternative 2", 
+      "method": "GET",
+      "url": "/api/weather?city=Berlin",
+      "expected": {
+        "status_code": 200,
+        "response_keys": ["city", "temperature", "description"]
+      }
+    },
+    {
+      "name": "Invalid City - Empty String",
+      "method": "GET",
+      "url": "/weather?city=",
+      "expected": {
+        "status_code": 400
+      }
+    },
+    {
+      "name": "Invalid City - Nonexistent",
+      "method": "GET",
+      "url": "/weather?city=NonexistentCity123",
+      "expected": {
+        "status_code": 404
+      }
+    },
+    {
+      "name": "Missing City Parameter",
+      "method": "GET",
+      "url": "/weather",
+      "expected": {
+        "status_code": 400
+      }
+    },
+    {
+      "name": "Special Characters in City Name",
+      "method": "GET", 
+      "url": "/weather?city=São Paulo",
+      "expected": {
+        "status_code": 200,
+        "response_keys": ["city", "temperature", "description"]
+      }
+    },
+    {
+      "name": "City with Spaces",
+      "method": "GET",
+      "url": "/weather?city=Los Angeles", 
+      "expected": {
+        "status_code": 200,
+        "response_keys": ["city", "temperature", "description"]
+      }
+    }
+  ]
+}

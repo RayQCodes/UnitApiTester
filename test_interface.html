@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather API Testing Dashboard</title>
+    <link rel="stylesheet" href="test_interface.css">
+    <style>
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .analytics-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .analytics-card h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .history-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .history-title {
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .history-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .history-status.completed {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .history-status.stopped {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .history-status.error {
+            background: #f44336;
+            color: white;
+        }
+        
+        .analytics-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .analytics-value {
+            font-weight: bold;
+            color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧪 Weather API Testing Dashboard</h1>
+            <p>Automated testing for weather applications with persistent data</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('testing')">🧪 Live Testing</button>
+            <button class="tab" onclick="showTab('history')">📚 Test History</button>
+            <button class="tab" onclick="showTab('analytics')">📊 Analytics</button>
+        </div>
+
+        <!-- Live Testing Tab -->
+        <div id="testing-tab" class="tab-content active">
+            <div class="main-content">
+                <!-- Configuration Panel -->
+                <div class="config-panel">
+                    <h2>🎯 Test Configuration</h2>
+                    
+                    <div class="form-group">
+                        <label for="target-url">Target API URL:</label>
+                        <input type="url" id="target-url" value="http://localhost:5000" 
+                               placeholder="http://localhost:5000">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="valid-cities">Valid Cities:</label>
+                            <input type="number" id="valid-cities" value="20" min="1" max="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="invalid-cities">Invalid Inputs:</label>
+                            <input type="number" id="invalid-cities" value="10" min="1" max="30">
+                        </div>
+                        <div class="form-group">
+                            <label for="edge-cases">Edge Cases:</label>
+                            <input type="number" id="edge-cases" value="8" min="1" max="20">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="delay">Delay (seconds):</label>
+                            <input type="number" id="delay" value="0.1" min="0" max="2" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="single-city">Single Test:</label>
+                            <input type="text" id="single-city" value="London" placeholder="City name">
+                        </div>
+                    </div>
+
+                    <div class="button-row">
+                        <button id="test-single-btn" class="btn btn-primary">🔍 Test Single City</button>
+                        <button id="run-tests-btn" class="btn btn-success">▶️ Run Test Suite</button>
+                        <button id="stop-tests-btn" class="btn btn-danger" disabled>⏹️ Stop Tests</button>
+                    </div>
+                </div>
+
+                <!-- Status Panel -->
+                <div class="status-panel">
+                    <h2>📊 Test Status</h2>
+                    
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <span class="status-label">Status:</span>
+                            <span id="test-status" class="status-value">Ready</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Progress:</span>
+                            <span id="test-progress" class="status-value">0/0</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Passed:</span>
+                            <span id="tests-passed" class="status-value success">0</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Failed:</span>
+                            <span id="tests-failed" class="status-value error">0</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+
+                    <div class="current-test">
+                        <strong>Current Test:</strong>
+                        <span id="current-test">No tests running</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="results-panel">
+                <div class="results-header">
+                    <h2>📋 Test Results</h2>
+                    <div class="results-controls">
+                        <button id="clear-results-btn" class="btn btn-secondary">🗑️ Clear</button>
+                        <button id="download-results-btn" class="btn btn-secondary">📥 Download</button>
+                        <select id="filter-results">
+                            <option value="all">All Results</option>
+                            <option value="passed">Passed Only</option>
+                            <option value="failed">Failed Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="results-container" id="results-container">
+                    <div class="no-results">
+                        <p>No test results yet. Run a test to see results here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test History Tab -->
+        <div id="history-tab" class="tab-content">
+            <div class="results-panel">
+                <div class="results-header">
+                    <h2>📚 Test History</h2>
+                    <div class="results-controls">
+                        <button id="refresh-history-btn" class="btn btn-primary">🔄 Refresh</button>
+                        <button id="export-all-btn" class="btn btn-secondary">📤 Export All</button>
+                    </div>
+                </div>
+                <div class="results-container" id="history-container">
+                    <div class="no-results">
+                        <p>Loading test history...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics-tab" class="tab-content">
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>🏙️ City Performance</h3>
+                    <div id="city-analytics">
+                        <div class="no-results">Loading city statistics...</div>
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <h3>🔗 Endpoint Performance</h3>
+                    <div id="endpoint-analytics">
+                        <div class="no-results">Loading endpoint statistics...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="results-panel">
+                <h2>📈 Test History Trends</h2>
+                <div id="history-trends">
+                    <div class="no-results">Loading historical trends...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Log -->
+        <div class="log-panel">
+            <h3>📝 Live Log</h3>
+            <div class="log-container" id="log-container">
+                <div class="log-entry">🚀 Dashboard loaded and ready</div>
+                <div class="log-entry">💾 Database-backed persistent storage enabled</div>
+                <div class="log-entry">📡 Waiting for test commands...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="test_interface.js"></script>
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load data for specific tabs
+            if (tabName === 'history') {
+                window.testDashboard.loadTestHistory();
+            } else if (tabName === 'analytics') {
+                window.testDashboard.loadAnalytics();
+            }
+        }
+    </script>
+</body>
+</html>
